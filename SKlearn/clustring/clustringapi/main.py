@@ -31,7 +31,7 @@ async def create_KmeansModel( filePath :str, noOfRows : int=0,noOfColumns : int=
 
 @router.post("/upload-file/")
 async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : int=0,noOfColumns : int=0,
-                             method: str = "elbow", clustringImageName : str = ""):
+                             method: str = "elbow", clustringImageName : str = "",kManualcluster : int = 0):
     print("start")
     file_location = f"SKlearn/clustring/clustringapi/uploadedFiles/{uploaded_file.filename}"
     try:
@@ -42,7 +42,8 @@ async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : in
             filedestination  =  os.path.join(os.path.dirname(__file__), f"uploadedFiles\{uploaded_file.filename}")
             print('filedestination', filedestination)
             Kmeansobj = Kmeans(filedestination, noOfRows, noOfColumns)
-            kmeans, y_kmeans,numberOfK = Kmeansobj.createmodel(method=method)
+            print("kManualcluster:",kManualcluster)
+            kmeans, y_kmeans,numberOfK = Kmeansobj.createmodel(method=method, k=kManualcluster)
             dirname = os.path.dirname(__file__)
             Kmeansobj.plotKMeans(kmeans, y_kmeans,clustringImageName)
             # Kmeansobj.kmeansEvaluation(kmeans)

@@ -90,7 +90,7 @@ class Kmeans():
         print('KMeansModel intertia is : ', kmeans.inertia_)
         print('KMeansModel No. of iteration is : ', kmeans.n_iter_)
 
-
+    #
     def plotKMeans(self,kmeans,y_kmeans,clustringImageName):
         colorList= ["red", "blue", "green", "pink", "black", "orange", "purple", "beige", "brown", "gray", "cyan", "magenta"]
         #colorList = ['r','b','g','c']
