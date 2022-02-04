@@ -3,9 +3,12 @@ from fastapi import FastAPI,status,HTTPException
 from fastapi import FastAPI
 from pydantic import  BaseModel
 from typing import Optional,List
-from database import SessionLocal
-import models
+from config import SessionLocal
+from config import engine
+import model
 from fastapi.middleware.cors import CORSMiddleware
+import router
+
 
 app = FastAPI()
 
@@ -19,7 +22,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(kmeans_main.router)
+app.include_router(router.router)
 
+# generate model to table postgresql
+model.Base.metadata.create_all(bind=engine)
+
+'''
 class Item(BaseModel): #serializer
     id:int
     name:str
@@ -38,7 +46,7 @@ db =SessionLocal()
 #     items = db.query(models.Item).all()
 #     return items
 
-'''
+
 @app.get('/item')
 def get_an_item():
     return {"message": "Hello World"}

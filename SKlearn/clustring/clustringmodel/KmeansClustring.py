@@ -15,19 +15,19 @@ class Kmeans():
     def __init__(self, filePath=None, noOfRows=0,noOfColumns=0):
         if filePath:
             print("file is readed")
-            dataset = pd.read_csv(filePath)
+            self.dataset = pd.read_csv(filePath)
             if noOfRows == 0 and noOfColumns == 0:
-                self.data = dataset.iloc[:, :].values
+                self.data = self.dataset.iloc[:, :].values
             elif noOfRows != 0 and noOfColumns == 0:
-                self.data = dataset.iloc[:noOfRows, :].values
+                self.data = self.dataset.iloc[:noOfRows, :].values
             elif noOfRows == 0 and noOfColumns != 0:
-                self.data = dataset.iloc[:, :noOfColumns].values
+                self.data = self.dataset.iloc[:, :noOfColumns].values
             else:
-                self.data = dataset.iloc[:noOfRows, :noOfColumns].values
+                self.data = self.dataset.iloc[:noOfRows, :noOfColumns].values
             #print(self.data )
             print(self.data.shape)
 
-    def createmodel(self,k=0,method="elbow"):
+    def createmodel(self,k=0,method="elbow" , OutputFileName=""):
 
         if k == 0 :
             modelK= self.bestK(method)
@@ -35,8 +35,12 @@ class Kmeans():
             modelK = k
         kmeans = KMeans(n_clusters=modelK, init='k-means++', max_iter = 300)
         y_kmeans = kmeans.fit_predict(self.data)
+        locValue : int = len(self.dataset.columns)
+        self.dataset.insert(loc=locValue ,column='cluster output',value=y_kmeans)
+        OutputFile =f"SKlearn/clustring/outputFiels/{OutputFileName}output.csv"
+        self.dataset.to_csv(OutputFile, index=False)
         numberOfK = modelK
-        print("numberOfK",modelK)
+
         return kmeans,y_kmeans , numberOfK
     #def readFile(self,filePath):
 
