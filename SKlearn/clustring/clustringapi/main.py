@@ -2,10 +2,11 @@ from fastapi import FastAPI,status,HTTPException,File,UploadFile
 from SKlearn.clustring.clustringmodel.KmeansClustring import Kmeans
 import os
 import sys
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
 from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from pathlib import Path
+from repository import JWTRepo, JWTBearer
 from fastapi.middleware.cors import CORSMiddleware
 
 router = APIRouter()
@@ -29,7 +30,7 @@ router = APIRouter()
 #     Kmeansobj.saveModel(kmeans, filename)
 #     return {"kmeans": "model created","n_iter":kmeans.n_iter_,"kmeans.inertia":kmeans.inertia_}
 
-@router.post("/upload-file/")
+@router.post("/upload-file/", dependencies=[Depends(JWTBearer())])
 async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : int=0,noOfColumns : int=0,
                              method: str = "elbow", clustringImageName : str = "",kManualcluster : int = 0):
     print("start")
@@ -60,20 +61,20 @@ async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : in
         )
 
 # @router.get("/")
-@router.post('/kmclustring/image', response_class=FileResponse, responses={200: {'content': {'image/png': {}}}})
+@router.post('/kmclustring/image', response_class=FileResponse, responses={200: {'content': {'image/png': {}}}}, dependencies=[Depends(JWTBearer())])
 async def getClusterImage(imageName):
     ROOT_DIR =Path(__file__).parent.parent
     root = str(ROOT_DIR )+ f"\images\{imageName}.png"
     print("ROOT :", root)
     return FileResponse(root, media_type='image/png')
 
-@router.get('/kmclustring/model', response_class=FileResponse)
+@router.get('/kmclustring/model', response_class=FileResponse, dependencies=[Depends(JWTBearer())])
 async def getClusterModel(modelName):
     projectPath = "D:\\PHDLAP\\MLaaS\\SKlearn\\clustring\\clustringapi\\savedmodel\\"
     print("ROOT :", projectPath )
     return FileResponse(projectPath +modelName , media_type='application/octet-stream',filename=modelName)
 
-@router.get('/kmclustring/outputdata', response_class=FileResponse)
+@router.get('/kmclustring/outputdata', response_class=FileResponse, dependencies=[Depends(JWTBearer())])
 async def getOutputFile(outputFileName):
     projectPath = "D:\\PHDLAP\\MLaaS\\SKlearn\\clustring\\outputFiels\\"
     print("ROOT :", projectPath )
