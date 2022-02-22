@@ -16,3 +16,12 @@ class Users(Base):
     create_date = Column(DateTime, default=datetime.datetime.now())
     update_date = Column(DateTime)
 
+class ML_Model_Information(Base):
+    __tablename__ = 'ML_Model_Information'
+    id = Column(Integer, primary_key=True)
+    username = Column(String)
+    model_Category = Column(String)
+    model_used = Column(String)
+    deployment_Model_Name = Column(String)
+    Model_Output_File_Name = Column(String)
+    create_date = Column(DateTime, default=datetime.datetime.now())

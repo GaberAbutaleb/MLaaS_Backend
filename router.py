@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Request
-from schema import RequestSchema, ResponseSchema,SignupRequestSchema, TokenResponse
+from schema import RequestSchema, ResponseSchema,SignupRequestSchema, TokenResponse,MLModInfoReq
 from sqlalchemy.orm import Session
 from config import get_db, ACCESS_TOKEN_EXPIRE_MINUTES
 from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo
-from model import Users
+from model import Users,ML_Model_Information
 from jose import jwt
 from datetime import datetime, timedelta
 
@@ -70,3 +70,26 @@ async def retrieve_all(request: Request,db: Session = Depends(get_db)):
     print (payload["userName"])
     _user = UsersRepo.retrieve_all(db, Users)
     return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result=_user).dict(exclude_none=True)
+
+
+@router.get("/userModelsInformation", dependencies=[Depends(JWTBearer())])
+async def retrieve_userModelsInformation(request: Request, model_Category: str,db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization').replace("Bearer ", "")
+    payload = jwt.decode(token, key='lemoncode21', options={"verify_signature": False})
+    print (payload["userName"])
+    _userInfo = UsersRepo.retrieve_by_ModuleCategory(db, ML_Model_Information,model_Category)
+    return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result=_userInfo).dict(exclude_none=True)
+
+
+@router.post("/InsertuserModelsInfo", dependencies=[Depends(JWTBearer())])
+async def InsertuserModelsInfo(request: Request,mlModelInfoObj : MLModInfoReq ,db: Session = Depends(get_db)):
+    token = request.headers.get('Authorization').replace("Bearer ", "")
+    payload = jwt.decode(token, key='lemoncode21', options={"verify_signature": False})
+    username = payload["userName"]
+    _MLM_Info = ML_Model_Information(username=username,
+                  model_Category=mlModelInfoObj.model_Category,
+                  model_used=mlModelInfoObj.model_used,
+                  deployment_Model_Name =mlModelInfoObj.deployment_Model_Name,
+                  Model_Output_File_Name = mlModelInfoObj.Model_Output_File_Name)
+    _userModelInfo = UsersRepo.insert(db, _MLM_Info)
+    return ResponseSchema(code="200", status="Ok", message="Sucess saved data", result=_userModelInfo).dict(exclude_none=True)

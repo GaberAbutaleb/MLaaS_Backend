@@ -13,6 +13,13 @@ class RequestSchema(BaseModel):
     username:str
     password:str
 
+class MLModInfoReq(BaseModel):
+    model_Category :str
+    model_used :str
+    deployment_Model_Name :str
+    Model_Output_File_Name :str
+
+
 class SignupRequestSchema(BaseModel):
     username:str
     password:str

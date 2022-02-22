@@ -24,6 +24,11 @@ class BaseRepo():
         return db.query(model).filter(model.id == id).all()
 
     @staticmethod
+    def retrieve_by_ModuleCategory(db: Session, model: Generic[T], model_Category: str):
+        return db.query(model).filter(model.model_Category == model_Category).all()
+
+
+    @staticmethod
     def insert(db: Session, model: Generic[T]):
         db.add(model)
         db.commit()
