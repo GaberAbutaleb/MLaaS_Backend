@@ -80,12 +80,15 @@ class Kmeans():
         filename = filename
         joblib.dump(kmeansModel, filename)
 
-    def predict(self, modelname,predictList):
-        model_loaded = joblib.load(modelname)
+    def predictmodel(modelname:str,predictList: List[float]):
+        # def predict(self, modelname, predictList: List[float]):
+        # print("predict")
+        projectPath = "D:\\PHDLAP\\MLaaS\\SKlearn\\clustring\\clustringapi\\savedmodel\\"
+        model_loaded = joblib.load(projectPath+modelname)
         l = predictList
-        #print(np.array(l).reshape(-1, len(l)))
+        # [4.9,2.4,3.3,1]
         belongCluster = model_loaded.predict(np.array(l).reshape(-1, len(l)))
-        return belongCluster
+        return int(belongCluster)
 
     def kmeansEvaluation(self,kmeans):
         # Calculating Details

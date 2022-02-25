@@ -1,6 +1,8 @@
 from fastapi import FastAPI,status,HTTPException,File,UploadFile
 from SKlearn.clustring.clustringmodel.KmeansClustring import Kmeans
+
 import os
+from typing import List
 import sys
 from fastapi import APIRouter,Depends
 from fastapi.responses import JSONResponse
@@ -8,6 +10,7 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from repository import JWTRepo, JWTBearer
 from fastapi.middleware.cors import CORSMiddleware
+from schema import PredictClustringModel
 
 router = APIRouter()
 # origins = ["*"]
@@ -80,3 +83,15 @@ async def getOutputFile(outputFileName):
     print("ROOT :", projectPath )
     return FileResponse(projectPath +outputFileName , media_type='application/octet-stream',filename=outputFileName)
 
+@router.post("/PredictClustringModel/", dependencies=[Depends(JWTBearer())])
+async def predictClustringModel(preClusModel :PredictClustringModel):
+    # print(preClusModel)
+    # belongCluster= -1;
+    # if preClusModel.modelUsed == 'kmeans':
+    #     print('kmeans')
+    belongCluster =Kmeans.predictmodel(preClusModel.modelName, preClusModel.predictList)
+    # elif preClusModel.modelUsed == 'hierarchical':
+    #     print('hierarchical')
+    #     belongCluster = HierarchicalCluster.predict(preClusModel.modelName, preClusModel.predictList)
+
+    return {'belongCluster':belongCluster}

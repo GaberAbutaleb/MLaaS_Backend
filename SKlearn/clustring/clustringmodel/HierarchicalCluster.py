@@ -48,7 +48,7 @@ class HierarchicalCluster():
         filename = filename
         joblib.dump(kmeansModel, filename)
 
-    def predict(self, modelname,predictList):
+    def predictmodel(self, modelname,predictList):
         model_loaded = joblib.load(modelname)
         l = predictList
         #print(np.array(l).reshape(-1, len(l)))

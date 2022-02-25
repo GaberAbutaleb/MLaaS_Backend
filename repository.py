@@ -1,14 +1,16 @@
 from typing import TypeVar, Generic, Optional
 from sqlalchemy.orm import Session
-
+from typing import List
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from config import SECRET_KEY, ALGORITHM
-
+from sqlalchemy import delete
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import Request, HTTPException
+
+from model import ML_Model_Information
 
 T = TypeVar('T')
 
@@ -51,6 +53,12 @@ class UsersRepo(BaseRepo):
     def find_by_username(db: Session, model: Generic[T], username: str):
         return db.query(model).filter(model.username == username).first()
 
+    @staticmethod
+    def delete_by_ids(db: Session,modelIds: List[int]):
+        # db.query(model).filter(model.id.in_(modelIds)).delete()
+        stmt = ( delete(ML_Model_Information).where(ML_Model_Information.id.in_(modelIds)))
+        db.execute(stmt)
+        db.commit()
 
 class JWTRepo():
 

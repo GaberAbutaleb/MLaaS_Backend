@@ -1,6 +1,7 @@
 from typing import Generic, Optional, TypeVar, Dict
 from pydantic.generics import GenericModel
 from pydantic import BaseModel, Field
+from typing import List
 
 T = TypeVar('T')
 
@@ -19,6 +20,10 @@ class MLModInfoReq(BaseModel):
     deployment_Model_Name :str
     Model_Output_File_Name :str
 
+class PredictClustringModel(BaseModel):
+    modelName: str
+    predictList: List[float]
+    modelUsed: str
 
 class SignupRequestSchema(BaseModel):
     username:str

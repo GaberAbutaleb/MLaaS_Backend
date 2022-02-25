@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 from repository import JWTRepo, JWTBearer, UsersRepo
 from model import Users,ML_Model_Information
 from jose import jwt
+from typing import List
 from datetime import datetime, timedelta
 
 router = APIRouter()
@@ -92,4 +93,12 @@ async def InsertuserModelsInfo(request: Request,mlModelInfoObj : MLModInfoReq ,d
                   deployment_Model_Name =mlModelInfoObj.deployment_Model_Name,
                   Model_Output_File_Name = mlModelInfoObj.Model_Output_File_Name)
     _userModelInfo = UsersRepo.insert(db, _MLM_Info)
+    return ResponseSchema(code="200", status="Ok", message="Sucess saved data", result=_userModelInfo).dict(exclude_none=True)
+
+@router.delete("/deleteuserModelsInfo/{modelIds}", dependencies=[Depends(JWTBearer())])
+async def InsertuserModelsInfo( modelIds: str,db: Session = Depends(get_db)):
+    string_list = modelIds.split(",")
+    intIdList = list(map(int, string_list))
+    mL_Model_Information = ML_Model_Information()
+    _userModelInfo = UsersRepo.delete_by_ids(db,intIdList)
     return ResponseSchema(code="200", status="Ok", message="Sucess saved data", result=_userModelInfo).dict(exclude_none=True)
