@@ -1,5 +1,6 @@
 from SKlearn.clustring.clustringapi import main as kmeans_main
 from SKlearn.clustring.clustringapi import HierarchicalClusterAPI
+from SKlearn.clustring.clustringapi import DBScanClusterAPI
 from fastapi import FastAPI,status,HTTPException
 from fastapi import FastAPI
 from pydantic import  BaseModel
@@ -24,6 +25,7 @@ app.add_middleware(
 )
 app.include_router(kmeans_main.router)
 app.include_router(HierarchicalClusterAPI.router)
+app.include_router(DBScanClusterAPI.router)
 app.include_router(router.router)
 
 # generate model to table postgresql
