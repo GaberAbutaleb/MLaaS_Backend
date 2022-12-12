@@ -1,5 +1,5 @@
 from config import Base,engine
-from model import Item
+# from model import Item
 
 print("Creating database ....")
 

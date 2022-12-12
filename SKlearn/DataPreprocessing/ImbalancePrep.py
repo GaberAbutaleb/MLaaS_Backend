@@ -25,6 +25,7 @@ class DataBalance:
             self.y = dataFrame[target]
             self.originalY = self.y
 
+
     def describe(self):
         print('Class Distribution: \n', self.y.value_counts())
         # visualize the target variable
@@ -50,14 +51,18 @@ class DataBalance:
         elif technique == 'UNDER':
             sample = RandomUnderSampler(sampling_strategy='majority')
         elif technique == 'SMOTE':
-            sample = SMOTE(sampling_strategy='auto',k_neighbors=5)
+            sample = SMOTE(sampling_strategy='auto',k_neighbors=3)
         elif technique == 'ENN':
             sample = EditedNearestNeighbours(sampling_strategy='auto', n_neighbors=3, kind_sel='all')
         elif technique =="TomLinks":
             sample = TomekLinks(sampling_strategy='majority')
         elif technique == "NearMiss" :
             sample = NearMiss()
+        print(self.X.shape)
+        print(self.y.shape)
         self.X, self.y= sample.fit_resample(self.X, self.y)
+        print(self.X.shape)
+        print(self.y.shape)
         print('Data Resampled Successfuly Using ', technique)
         print('original dataset shape:', Counter(self.originalY))
         print('Resample dataset shape', Counter( self.y))

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt2
 import pandas as pd
 import scipy.cluster.hierarchy as sch
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.metrics import silhouette_score,calinski_harabasz_score,davies_bouldin_score
 import numpy as np
 import joblib
 
@@ -27,12 +28,21 @@ class HierarchicalCluster():
 
         hierarchicalcluster = AgglomerativeClustering(n_clusters=k,  affinity = affinity,linkage = linkage )
         y_HCModel = hierarchicalcluster.fit_predict(self.data)
+        silhouette_score1 = silhouette_score(self.data, y_HCModel)
+        calinski_harabasz_score1 = calinski_harabasz_score(self.data, y_HCModel)
+        davies_bouldin_score1 = davies_bouldin_score(self.data, y_HCModel)
+        # inertia1 = hierarchicalcluster.inertia_
+        # print('Intertia at K =', k, ':', inertia1)
+        print("Silhouette Coefficient: %0.3f" % silhouette_score1)
+        print("Calinski-Harabasz Index: %0.3f" % calinski_harabasz_score1)
+        print("Davies-Bouldin Index: %0.3f" % davies_bouldin_score1)
+        print("---------------------------------------------------------------")
         locValue : int = len(self.dataset.columns)
         self.dataset.insert(loc=locValue ,column='cluster output',value=y_HCModel)
         OutputFile =f"SKlearn/clustring/outputFiels/{OutputFileName}output.csv"
         self.dataset.to_csv(OutputFile, index=False)
         numberOfK = k
-        return hierarchicalcluster,y_HCModel , numberOfK
+        return hierarchicalcluster,y_HCModel , numberOfK,silhouette_score1,calinski_harabasz_score1,davies_bouldin_score1
 
     def drawDendoGram(self):
         dendrogram = sch.dendrogram(sch.linkage(self.data , method='ward'))

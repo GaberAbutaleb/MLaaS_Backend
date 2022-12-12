@@ -78,7 +78,8 @@ async def retrieve_userModelsInformation(request: Request, model_Category: str,d
     token = request.headers.get('Authorization').replace("Bearer ", "")
     payload = jwt.decode(token, key='lemoncode21', options={"verify_signature": False})
     print (payload["userName"])
-    _userInfo = UsersRepo.retrieve_by_ModuleCategory(db, ML_Model_Information,model_Category)
+    # _userInfo = UsersRepo.retrieve_by_ModuleCategory(db, ML_Model_Information,model_Category)
+    _userInfo = UsersRepo.retrieve_all(db, ML_Model_Information)
     return ResponseSchema(code="200", status="Ok", message="Sucess retrieve data", result=_userInfo).dict(exclude_none=True)
 
 
@@ -87,6 +88,7 @@ async def InsertuserModelsInfo(request: Request,mlModelInfoObj : MLModInfoReq ,d
     token = request.headers.get('Authorization').replace("Bearer ", "")
     payload = jwt.decode(token, key='lemoncode21', options={"verify_signature": False})
     username = payload["userName"]
+    print(mlModelInfoObj)
     _MLM_Info = ML_Model_Information(username=username,
                   model_Category=mlModelInfoObj.model_Category,
                   model_used=mlModelInfoObj.model_used,
@@ -97,6 +99,7 @@ async def InsertuserModelsInfo(request: Request,mlModelInfoObj : MLModInfoReq ,d
 
 @router.delete("/deleteuserModelsInfo/{modelIds}", dependencies=[Depends(JWTBearer())])
 async def InsertuserModelsInfo( modelIds: str,db: Session = Depends(get_db)):
+    print(modelIds)
     string_list = modelIds.split(",")
     intIdList = list(map(int, string_list))
     mL_Model_Information = ML_Model_Information()

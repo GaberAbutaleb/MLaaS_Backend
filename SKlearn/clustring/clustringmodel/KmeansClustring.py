@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt2
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score,calinski_harabasz_score,davies_bouldin_score
+
 from kneed import  KneeLocator
 import joblib
 
@@ -32,15 +33,26 @@ class Kmeans():
             modelK= self.bestK(method)
         else:
             modelK = k
+        print("kmeans Start")
         kmeans = KMeans(n_clusters=modelK, init='k-means++', max_iter = 300)
         y_kmeans = kmeans.fit_predict(self.data)
+        silhouette_score1 = silhouette_score(self.data, y_kmeans)
+        calinski_harabasz_score1 = calinski_harabasz_score(self.data, y_kmeans)
+        davies_bouldin_score1 = davies_bouldin_score(self.data, y_kmeans)
+        inertia1=kmeans.inertia_
+        print('Intertia at K =',modelK, ':', inertia1)
+        print("Silhouette Coefficient: %0.3f" % silhouette_score1)
+        print("Calinski-Harabasz Index: %0.3f" % calinski_harabasz_score1)
+        print("Davies-Bouldin Index: %0.3f" % davies_bouldin_score1)
+        print("---------------------------------------------------------------")
         locValue : int = len(self.dataset.columns)
         self.dataset.insert(loc=locValue ,column='cluster output',value=y_kmeans)
+        print(self.dataset['cluster output'].value_counts())
         OutputFile =f"SKlearn/clustring/outputFiels/{OutputFileName}output.csv"
         self.dataset.to_csv(OutputFile, index=False)
         numberOfK = modelK
 
-        return kmeans,y_kmeans , numberOfK
+        return kmeans,y_kmeans , numberOfK,silhouette_score1,calinski_harabasz_score1,davies_bouldin_score1
     #def readFile(self,filePath):
 
 
@@ -48,7 +60,7 @@ class Kmeans():
         #print("bestK ")
         #print(self.data.shape)
         data_frame = self.data
-        range_n_clusters = [2, 3, 4, 5, 6, 7, 8]
+        range_n_clusters = [2, 3, 4, 5, 6, 7, 8,9]
         silhouette_avg = []
         wcss = []
         for num_clusters in range_n_clusters:
@@ -62,6 +74,7 @@ class Kmeans():
                 wcss.append(kmeans.inertia_)
         if method == "silhouette":
             K = range_n_clusters[silhouette_avg.index(max(silhouette_avg))]
+            print("range_n_clusters",range_n_clusters)
             print("The best k from silhouette",K )
             return K
         else:

@@ -28,14 +28,19 @@ async def create_upload_file(request: Request,uploaded_file: UploadFile = File(.
             print('filedestination', filedestination)
             HierarchicalClusterobj = HierarchicalCluster(filedestination, noOfRows, noOfColumns)
             print("HierarchicalCluster:",number_of_HCluster)
-            Hierarchicalcluster, y_Hierarchicalcluster,numberOfK = \
+            Hierarchicalcluster, y_Hierarchicalcluster,numberOfK,silhouette_score,calinski_harabasz_score,\
+                davies_bouldin_score= \
                 HierarchicalClusterobj.createmodel( k=number_of_HCluster,affinity=affinity,linkage=linkage,OutputFileName =clustringImageName)
             dirname = os.path.dirname(__file__)
             HierarchicalClusterobj.plotKMeans(Hierarchicalcluster, y_Hierarchicalcluster,clustringImageName)
             filename = os.path.join(dirname, 'savedmodel/'+clustringImageName+'.pkl')
             HierarchicalClusterobj.saveModel(Hierarchicalcluster, filename)
             print("numberOfK", numberOfK)
-            return { "numberOfK": str(numberOfK),"HierarchicalCluster": "model created", "n_clusters": Hierarchicalcluster.n_clusters}
+            return { "numberOfK": str(numberOfK),"HierarchicalCluster": "model created", "n_clusters": Hierarchicalcluster.n_clusters,
+                     "silhouette_score": silhouette_score,
+                     "calinski_harabasz_score": calinski_harabasz_score,
+                     "davies_bouldin_score": davies_bouldin_score
+                     }
 
     except Exception as e:
         return JSONResponse(

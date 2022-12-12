@@ -47,7 +47,7 @@ async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : in
             print('filedestination', filedestination)
             Kmeansobj = Kmeans(filedestination, noOfRows, noOfColumns)
             print("kManualcluster:",kManualcluster)
-            kmeans, y_kmeans,numberOfK = Kmeansobj.createmodel(method=method, k=kManualcluster,OutputFileName =clustringImageName)
+            kmeans, y_kmeans,numberOfK,silhouette_score,calinski_harabasz_score,davies_bouldin_score = Kmeansobj.createmodel(method=method, k=kManualcluster,OutputFileName =clustringImageName)
 
             dirname = os.path.dirname(__file__)
             Kmeansobj.plotKMeans(kmeans, y_kmeans,clustringImageName)
@@ -55,7 +55,10 @@ async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : in
             filename = os.path.join(dirname, 'savedmodel/'+clustringImageName+'.pkl')
             Kmeansobj.saveModel(kmeans, filename)
             print("numberOfK", numberOfK)
-            return { "numberOfK": str(numberOfK),"kmeans": "model created", "n_iter": kmeans.n_iter_, "inertia": kmeans.inertia_}
+            return { "numberOfK": str(numberOfK),"kmeans": "model created", "n_iter": kmeans.n_iter_,
+                     "inertia": kmeans.inertia_,"silhouette_score":silhouette_score,
+                     "calinski_harabasz_score":calinski_harabasz_score,
+                     "davies_bouldin_score":davies_bouldin_score}
 
     except Exception as e:
         return JSONResponse(

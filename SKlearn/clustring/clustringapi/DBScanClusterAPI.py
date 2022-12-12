@@ -27,7 +27,7 @@ async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : in
             print('filedestination', filedestination)
             DBScansobj = DBScan(filedestination, noOfRows, noOfColumns)
             print("espvalue:",espvalue)
-            DBSCan, y_DBScan,numberOfK ,epsvalue= DBScansobj.createmodel( k=espvalue,minSamples = minSamples,OutputFileName =clustringImageName)
+            DBSCan, y_DBScan,numberOfK ,epsvalue,silhouette_score,calinski_harabasz_score,davies_bouldin_score= DBScansobj.createmodel( k=espvalue,minSamples = minSamples,OutputFileName =clustringImageName)
 
             dirname = os.path.dirname(__file__)
             DBScansobj.plotDBScan(DBSCan, y_DBScan,clustringImageName)
@@ -35,7 +35,10 @@ async def create_upload_file(uploaded_file: UploadFile = File(...),noOfRows : in
             filename = os.path.join(dirname, 'savedmodel/'+clustringImageName+'.pkl')
             DBScansobj.saveModel(DBSCan, filename)
             print("numberOfK", numberOfK)
-            return { "numberOfK": str(numberOfK),"DBScan": "model created", "n_noise":list(DBSCan.labels_).count(-1), "epsvalue":epsvalue}
+            return { "numberOfK": str(numberOfK),"DBScan": "model created", "n_noise":list(DBSCan.labels_).count(-1),
+                     "epsvalue":epsvalue,"silhouette_score":silhouette_score,
+                     "calinski_harabasz_score":calinski_harabasz_score,
+                     "davies_bouldin_score":davies_bouldin_score}
 
     except Exception as e:
         return JSONResponse(

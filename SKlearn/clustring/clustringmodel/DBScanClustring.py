@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import silhouette_score,calinski_harabasz_score,davies_bouldin_score
 from kneed import KneeLocator
 import joblib
 
@@ -25,7 +26,6 @@ class DBScan():
             else:
                 self.data = self.dataset.iloc[:noOfRows, :noOfColumns].values
             print(self.data.shape)
-
     def createmodel(self, k=0,minSamples = 10, OutputFileName=""):
 
         if k== 0:
@@ -38,6 +38,15 @@ class DBScan():
         labels = dbscan_cluster.labels_
         N_clus = len(set(labels)) - (1 if -1 in labels else 0)
         print('Estimated no. of clusters: %d' % N_clus)
+        silhouette_score1 = silhouette_score(self.data, labels)
+        calinski_harabasz_score1 = calinski_harabasz_score(self.data, labels)
+        davies_bouldin_score1 = davies_bouldin_score(self.data, labels)
+        # inertia1 = dbscan_cluster.inertia_
+        # print('Intertia at K =', k, ':', inertia1)
+        print("Silhouette Coefficient: %0.3f" % silhouette_score1)
+        print("Calinski-Harabasz Index: %0.3f" % calinski_harabasz_score1)
+        print("Davies-Bouldin Index: %0.3f" % davies_bouldin_score1)
+        print("---------------------------------------------------------------")
         # Identify Noise
         n_noise = list(dbscan_cluster.labels_).count(-1)
         print('Estimated no. of noise points: %d' % n_noise)
@@ -46,7 +55,7 @@ class DBScan():
         OutputFile = f"SKlearn/clustring/outputFiels/{OutputFileName}output.csv"
         self.dataset.to_csv(OutputFile, index=False)
         epsvalue = eps
-        return dbscan_cluster, labels, N_clus, epsvalue
+        return dbscan_cluster, labels, N_clus, epsvalue,silhouette_score1,calinski_harabasz_score1,davies_bouldin_score1
 
     def bestK(self):
         data_frame = self.data

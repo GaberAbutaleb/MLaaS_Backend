@@ -1,10 +1,13 @@
 from fastapi import FastAPI,status,HTTPException,File,UploadFile,Depends,Form
-from SKlearn.DataPreprocessing.DataCleaning_old import DataCleaning
+
 from SKlearn.DataPreprocessing.DataExplorationReport import PDF,PDFCreation
 from SKlearn.DataPreprocessing.PreprocessingRequest import PreProcesingRequest
 from SKlearn.DataPreprocessing.DataCleaningPrep import DataCleaning
 from SKlearn.DataPreprocessing.DataOutlierPrep import OutlierPrep
 from SKlearn.DataPreprocessing.DataScalingPrep import  DataScaling
+from SKlearn.DataPreprocessing.DimensionalityReductionPrep import  DimensionalityReductionPrep
+from SKlearn.DataPreprocessing.ImbalancePrep import  DataBalance
+from SKlearn.DataPreprocessing.CategoricalDataPrep import CategoricalData
 import os
 import sys
 from typing import ClassVar, List
@@ -67,8 +70,9 @@ async def getdataexplorationreport(uploaded_file: UploadFile = File(...)):
             print("filedestination", filedestination)
             pdfCreation = PDFCreation(filedestination)
             filename = pdfCreation.startUp()
+            print(filename, " is Created")
             return FileResponse(filename, media_type='application/octet-stream', filename="Data Exploration Report.pdf")
-            filedestination = os.path.join(os.path.dirname(__file__), f"uploadedFiles\{uploaded_file.filename}")
+            # filedestination = os.path.join(os.path.dirname(__file__), f"uploadedFiles\{uploaded_file.filename}")
 
     except Exception as e:
         return JSONResponse(
@@ -76,16 +80,24 @@ async def getdataexplorationreport(uploaded_file: UploadFile = File(...)):
             content={'message': str(e)}
         )
 @router.post('/MLaaS/dataPreprocessing', response_class=FileResponse)
-async def dataPreprocessing(handleDataCleaning: bool,dO_HandlingOutliers : bool,dS_HandelScaling:bool,
+async def dataPreprocessing(handleDataCleaning: bool=True,dO_HandlingOutliers : bool=True,dCD_HandelCategoricalData:bool =True,dS_HandelScaling:bool=True,
+    dI_HandelImbalance:bool=True,
+    dR_HandelDimRed:bool=True,
     dC_HandlingMethod : str="median",
     dC_columnList : str="",
     dC_Threshold : int=6,
+    dR_n_components :int=6,
     dC_regTarColumn="",
     dO_detectionMethod ="iqrMethod" ,
     dO_HandlingMethod="median",
     dS_columnsList:str ="",
+    categoryEncoderMethod = "OneHotEncoding",
     dS_scaleMethod="StandardScaler",
+    dI_className="",
+    dI_technique = "RCMND",
+    dR_handelingMethod="PCA",
     uploaded_file: UploadFile = File(...)) :
+    print("DataPreProcessing")
     if(dC_columnList):
         dC_columnList=dC_columnList.split(",")
     else:
@@ -114,10 +126,22 @@ async def dataPreprocessing(handleDataCleaning: bool,dO_HandlingOutliers : bool,
                 outlierPrepObj =OutlierPrep(df)
                 df= outlierPrepObj.handleAllOutliers(df,HandlingMethod=dO_HandlingMethod,detectionMethod =dO_detectionMethod)
                 print("HandlingOutliers")
+            if(dCD_HandelCategoricalData):
+                print("dCD_HandelCategoricalData")
+                categoricalDataObj=CategoricalData()
+                df=categoricalDataObj.HandelCategoricalData(df,category_encoder_method=categoryEncoderMethod)
+            if (dI_HandelImbalance):
+                print("dI_HandelImbalance")
+                dataBalanceObj = DataBalance(dataFrame=df, target=dI_className)
+                df = dataBalanceObj.balance(technique=dI_technique)
+            if(dR_HandelDimRed):
+                print("dR_HandelDimRed")
+                DimRedPrep = DimensionalityReductionPrep(df, dR_n_components, dR_handelingMethod)
+                df = DimRedPrep.handelingDimRed()
             if(dS_HandelScaling):
                 print("HandelScaling")
                 dataScalingObj = DataScaling()
-                df=dataScalingObj.HandlingScale(df=df, columnsList=[], scaleMethod="StandardScaler")
+                df=dataScalingObj.HandlingScale(df=df, columnsList=dS_columnsList, scaleMethod=dS_scaleMethod)
 
         dirname = os.path.dirname(__file__)
         finalOutputFilePath = f'{dirname}/downloadedFiles/'
